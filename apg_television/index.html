@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>APG Television</title>
+<style>
+body {margin:0;font-family:Arial,sans-serif;background:black;color:white;display:flex;height:100vh;}
+.tv-screen {flex:3;position:relative;display:flex;align-items:center;justify-content:center;overflow:hidden;}
+video,img {width:100%;height:100%;object-fit:cover;}
+.channel-name {position:absolute;top:50px;left:20px;font-size:2rem;background:rgba(0,0,0,0.5);padding:5px 10px;border-radius:5px;z-index:15;}
+.news-ticker {position:absolute;bottom:0;width:100%;background:rgba(255,0,0,0.7);color:white;font-weight:bold;white-space:nowrap;overflow:hidden;z-index:15;}
+.news-ticker p {display:inline-block;padding-left:100%;animation:scroll 20s linear infinite;margin:0;}
+@keyframes scroll {0% { transform: translateX(0%);} 100% { transform: translateX(-100%);}}
+#screenBug {position:absolute;bottom:10px;right:10px;height:40px;width:auto;z-index:20;opacity:0.8;}
+#clock {position:absolute;top:50px;right:20px;font-size:1.5rem;background:rgba(0,0,0,0.5);padding:5px 10px;border-radius:5px;z-index:15;}
+#techDiff,#apologyMode {display:none;position:absolute;top:0;left:0;width:100%;height:100%;z-index:100;background:black;color:white;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:20px;}
+#topBar {position:absolute;top:0;left:0;width:100%;height:40px;background:rgba(0,0,0,0.8);color:white;display:flex;align-items:center;padding:0 10px;z-index:200;}
+#topBar span {font-weight:bold;margin-right:20px;cursor:pointer;}
+#adminButtons {display:flex;gap:10px;align-items:center;}
+button {padding:3px 8px;font-size:0.9rem;background-color:red;color:white;border:none;border-radius:3px;cursor:pointer;opacity:0.8;}
+#apologyBtn {background:orange;color:black;}
+</style>
+</head>
+<body>
+
+<div id="topBar">
+    <span id="toggleBar">☰ Admin Tools</span>
+    <div id="adminButtons">
+        <button id="techBtn">Technical Difficulty</button>
+        <button id="apologyBtn">Hijack/Apology</button>
+    </div>
+</div>
+
+<div class="tv-screen">
+    <div id="channelName" class="channel-name">APG Television - APG News</div>
+    <div id="clock">00:00:00</div>
+    <img id="apgGif" src="apglogo.gif" alt="APG News">
+    <video id="tvVideo" autoplay muted style="display:none;"></video>
+    <audio id="newsMusic" src="news.mp3" loop></audio>
+    <img id="screenBug" src="sb.png" alt="Screen Bug">
+    <img id="techDiff" src="tech_diff.gif" alt="Technical Difficulty">
+    <div id="apologyMode">
+        <h1>📢 Message from the International APG Media Group</h1>
+        <p>We apologize for the recent broadcast interruption on APG Television.</p>
+        <p>The issue has been fixed and programming will resume shortly.</p>
+        <p>Thank you for your patience and support.</p>
+    </div>
+    <div class="news-ticker"><p id="ticker-text">Loading news...</p></div>
+</div>
+
+<script>
+// Elements
+const apgGif = document.getElementById('apgGif');
+const videoEl = document.getElementById('tvVideo');
+const tickerText = document.getElementById('ticker-text');
+const channelName = document.getElementById('channelName');
+const clock = document.getElementById('clock');
+const newsMusic = document.getElementById('newsMusic');
+const techDiff = document.getElementById('techDiff');
+const apologyMode = document.getElementById('apologyMode');
+const techBtn = document.getElementById('techBtn');
+const apologyBtn = document.getElementById('apologyBtn');
+const toggleBar = document.getElementById('toggleBar');
+const adminButtons = document.getElementById('adminButtons');
+
+let currentIndex = -1;
+let isVideoPlaying = false;
+let inTechnicalDifficulty = false;
+
+// Hide all modes initially
+apologyMode.style.display='none';
+techDiff.style.display='none';
+apgGif.style.display='block';
+videoEl.style.display='none';
+
+// Enable music after click
+document.body.addEventListener('click',()=>{newsMusic.play().catch(()=>{});},{once:true});
+
+// Toggle admin buttons
+toggleBar.addEventListener('click',()=>{adminButtons.style.display=(adminButtons.style.display==='none')?'flex':'none';});
+
+// Playlist
+const playlist = [
+    {src:'videos/1.mp4',title:'APG Video 1'},
+    {src:'videos/2.mp4',title:'APG Video 2'},
+    {src:'videos/icer1.mp4',title:'Icer Video 1'},
+    {src:'videos/icer2.mp4',title:'Icer Video 2'}
+];
+
+// News messages
+const newsMessages = [
+    "APG Television launches its new online channel today!",
+    "Stay tuned for more exciting videos from Icer and friends!",
+    "Breaking: APG News brings you the latest updates from the community!",
+    "APG Television will air new videos every week, including special events!"
+];
+let tickerIndex=0;
+function updateTicker(){tickerText.textContent=newsMessages[tickerIndex];tickerIndex=(tickerIndex+1)%newsMessages.length;}
+updateTicker();setInterval(updateTicker,15000);
+
+// Clock
+function updateClock(){const now=new Date();clock.textContent=`${now.getHours().toString().padStart(2,'0')}:${now.getMinutes().toString().padStart(2,'0')}:${now.getSeconds().toString().padStart(2,'0')}`;}
+updateClock();setInterval(updateClock,1000);
+
+// Playback
+function showGif(){if(inTechnicalDifficulty) return; videoEl.style.display='none'; videoEl.src=''; apgGif.style.display='block'; isVideoPlaying=false; currentIndex=-1; channelName.textContent="APG Television - APG News"; if(Math.random()<0.4){currentIndex=Math.floor(Math.random()*playlist.length); setTimeout(playVideo,2000);}}
+function playVideo(){if(inTechnicalDifficulty) return; newsMusic.pause(); apgGif.style.display='none'; videoEl.style.display='block'; videoEl.src=playlist[currentIndex].src; videoEl.play(); isVideoPlaying=true; channelName.textContent=playlist[currentIndex].title; videoEl.onended=showGif;}
+function playAd(){if(inTechnicalDifficulty) return; newsMusic.pause(); apgGif.style.display='none'; videoEl.style.display='block'; videoEl.src='ads/telekom.mp4'; videoEl.play(); channelName.textContent="APG Advertisement"; videoEl.onended=showGif;}
+
+// Technical Difficulty
+function showTechnicalDifficulty(duration=10000){inTechnicalDifficulty=true; newsMusic.pause(); videoEl.pause(); apgGif.style.display='none'; videoEl.style.display='none'; apologyMode.style.display='none'; techDiff.style.display='block'; channelName.textContent="APG Television - Technical Difficulty"; setTimeout(endTechnicalDifficulty,duration);}
+function endTechnicalDifficulty(){techDiff.style.display='none'; inTechnicalDifficulty=false; showGif();}
+
+// Hijack / Apology Mode
+function showApology(duration=15000){inTechnicalDifficulty=true; newsMusic.pause(); videoEl.pause(); apgGif.style.display='none'; videoEl.style.display='none'; techDiff.style.display='none'; apologyMode.style.display='flex'; channelName.textContent="APG Television - Hijack / Apology"; setTimeout(endApology,duration);}
+function endApology(){apologyMode.style.display='none'; inTechnicalDifficulty=false; showGif();}
+
+// Admin triggers
+techBtn.addEventListener('click',()=>{showTechnicalDifficulty(10000);});
+apologyBtn.addEventListener('click',()=>{showApology(15000);});
+
+// Random videos/ads
+setInterval(()=>{if(!isVideoPlaying&&!inTechnicalDifficulty&&Math.random()<0.3){currentIndex=Math.floor(Math.random()*playlist.length);playVideo();}},30000);
+setInterval(()=>{if(!isVideoPlaying&&!inTechnicalDifficulty&&Math.random()<0.2){playAd();}},30000);
+setInterval(()=>{if(!isVideoPlaying&&!inTechnicalDifficulty) playAd();},150000);
+
+// Start with GIF
+showGif();
+</script>
+</body>
+</html>
