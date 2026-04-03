@@ -1,0 +1,632 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>APG Cable TV Guide 2007</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, Verdana, sans-serif;
+            background: linear-gradient(135deg, #e8e8e8 0%, #d4d4d4 50%, #c0c0c0 100%);
+            color: #333;
+            overflow: hidden;
+            height: 100vh;
+        }
+
+        .container {
+            display: flex;
+            height: 100vh;
+            width: 100vw;
+            gap: 8px;
+            padding: 8px;
+        }
+
+        /* ====== SIDEBAR ====== */
+        .sidebar {
+            width: 200px;
+            background: linear-gradient(90deg, #f0f0f0 0%, #e8e8e8 100%);
+            border: 1px solid #999;
+            border-radius: 8px;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 
+                inset 0 0 0 1px rgba(255,255,255,0.8),
+                0 4px 8px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+
+        .logo {
+            padding: 12px;
+            background: linear-gradient(180deg, #ff6600 0%, #ee5500 100%);
+            border-bottom: 2px solid #cc4400;
+            text-align: center;
+            box-shadow: inset 0 1px 0 rgba(255,255,255,0.4);
+        }
+
+        .logo h1 {
+            font-size: 14px;
+            font-weight: bold;
+            color: #fff;
+            text-shadow: 0 2px 3px rgba(0,0,0,0.5);
+            letter-spacing: 1px;
+            margin-bottom: 2px;
+        }
+
+        .logo-subtitle {
+            font-size: 9px;
+            color: rgba(255,255,255,0.9);
+            text-shadow: 0 1px 2px rgba(0,0,0,0.5);
+        }
+
+        .channel-list {
+            flex: 1;
+            overflow: hidden;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+        }
+
+        .channel-item {
+            padding: 16px;
+            cursor: default;
+            position: relative;
+            display: block;
+            border: none;
+            height: auto;
+            margin: 0;
+            background: transparent;
+            border: none;
+            box-shadow: none;
+        }
+
+        .channel-item:hover {
+            background: transparent;
+        }
+
+        .channel-item.active {
+            background: transparent;
+        }
+
+        .channel-item-number {
+            min-width: auto;
+            background: transparent;
+            display: block;
+            font-size: 48px;
+            font-weight: bold;
+            color: #4a90e2;
+            border: none;
+            box-shadow: none;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.2);
+            margin-bottom: 8px;
+        }
+
+        .channel-item.active .channel-item-number {
+            background: transparent;
+            border: none;
+        }
+
+        .channel-item-info {
+            flex: 0;
+            padding: 0;
+            display: block;
+            overflow: visible;
+        }
+
+        .channel-item-name {
+            font-size: 13px;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 4px;
+            white-space: normal;
+            overflow: visible;
+            text-overflow: clip;
+        }
+
+        .channel-item.active .channel-item-name {
+            color: #333;
+        }
+
+        .channel-item-label {
+            font-size: 9px;
+            color: #999;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .channel-item.active .channel-item-label {
+            color: #999;
+        }
+
+        /* SCROLLBAR */
+        .channel-list::-webkit-scrollbar {
+            width: 0;
+        }
+
+        /* ====== MAIN CONTENT ====== */
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            background: linear-gradient(135deg, #f0f0f0 0%, #e8e8e8 100%);
+            border: 1px solid #999;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 
+                inset 0 0 0 1px rgba(255,255,255,0.8),
+                0 4px 12px rgba(0,0,0,0.3);
+        }
+
+        /* HEADER */
+        .header {
+            background: linear-gradient(90deg, #4a90e2 0%, #357abd 100%);
+            border-bottom: 2px solid #2d5a8f;
+            padding: 14px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 
+                inset 0 1px 0 rgba(255,255,255,0.3),
+                0 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .now-playing {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .now-playing-label {
+            font-size: 10px;
+            text-transform: uppercase;
+            color: rgba(255,255,255,0.8);
+            letter-spacing: 1px;
+            font-weight: bold;
+        }
+
+        .now-playing-title {
+            font-size: 20px;
+            font-weight: bold;
+            color: #fff;
+            text-shadow: 0 2px 3px rgba(0,0,0,0.5);
+        }
+
+        .time-display {
+            text-align: right;
+            color: #fff;
+        }
+
+        .time-display .date {
+            font-size: 11px;
+            color: rgba(255,255,255,0.9);
+            margin-bottom: 4px;
+        }
+
+        .time-display .time {
+            font-size: 18px;
+            font-weight: bold;
+            font-family: 'Courier New', monospace;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.5);
+        }
+
+        /* VIDEO PLAYER */
+        .video-container {
+            flex: 1;
+            background: #000;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            margin: 8px;
+            border: 2px solid #999;
+            border-radius: 4px;
+            box-shadow: 
+                inset 0 0 10px rgba(0,0,0,0.8),
+                0 4px 8px rgba(0,0,0,0.4);
+        }
+
+        #tv-frame {
+            width: 100%;
+            height: 100%;
+            border: none;
+            background: #000;
+        }
+
+        /* INFO BAR */
+        .info-bar {
+            background: linear-gradient(90deg, #f0f0f0 0%, #e8e8e8 100%);
+            border-top: 1px solid #999;
+            border-bottom: 1px solid #fff;
+            padding: 12px 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 11px;
+            color: #555;
+            box-shadow: inset 0 1px 0 rgba(255,255,255,0.8);
+        }
+
+        .controls-hint {
+            display: flex;
+            gap: 16px;
+        }
+
+        .control-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 11px;
+            white-space: nowrap;
+        }
+
+        .control-key {
+            background: linear-gradient(180deg, #e8e8e8 0%, #d0d0d0 100%);
+            border: 1px outset #999;
+            padding: 4px 10px;
+            border-radius: 3px;
+            color: #333;
+            font-weight: bold;
+            font-size: 11px;
+            box-shadow: 
+                inset 0 1px 0 rgba(255,255,255,0.6),
+                0 2px 3px rgba(0,0,0,0.2);
+            text-shadow: 0 1px 0 rgba(255,255,255,0.5);
+            min-width: 28px;
+            text-align: center;
+            display: inline-block;
+        }
+
+        .control-key:active {
+            box-shadow: 
+                inset 0 2px 4px rgba(0,0,0,0.3),
+                inset 0 -1px 0 rgba(255,255,255,0.2);
+        }
+
+        /* TICKER */
+        .ticker {
+            background: #1a1a1a;
+            border-top: 2px solid #ff6600;
+            padding: 6px 0;
+            overflow: hidden;
+            font-size: 11px;
+            color: #ffff00;
+            font-weight: bold;
+            letter-spacing: 0.5px;
+            box-shadow: inset 0 1px 0 rgba(255,255,255,0.1);
+        }
+
+        .ticker-content {
+            display: flex;
+            animation: ticker-scroll 40s linear infinite;
+            white-space: nowrap;
+        }
+
+        .ticker-item {
+            padding: 0 40px;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .ticker-item::before {
+            content: '●';
+            color: #ff6600;
+            font-size: 8px;
+        }
+
+        @keyframes ticker-scroll {
+            from { transform: translateX(100%); }
+            to { transform: translateX(-100%); }
+        }
+
+        /* ====== MODAL - GUIDE ====== */
+        .modal {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.85);
+            display: none;
+            z-index: 1000;
+            overflow-y: auto;
+            padding: 20px;
+        }
+
+        .modal.active {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-content {
+            background: linear-gradient(135deg, #f0f0f0 0%, #e8e8e8 100%);
+            border: 2px solid #999;
+            border-radius: 8px;
+            padding: 24px;
+            max-width: 800px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+            box-shadow: 
+                inset 0 0 0 1px rgba(255,255,255,0.8),
+                0 8px 20px rgba(0,0,0,0.6);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 12px;
+            border-bottom: 2px solid #4a90e2;
+        }
+
+        .modal h2 {
+            font-size: 22px;
+            color: #333;
+            margin: 0;
+            font-weight: bold;
+        }
+
+        .modal-close {
+            background: linear-gradient(180deg, #ff9933 0%, #ff7700 100%);
+            border: 1px outset #cc5500;
+            color: #fff;
+            width: 32px;
+            height: 32px;
+            border-radius: 4px;
+            font-size: 18px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.15s ease;
+            box-shadow: 
+                inset 0 1px 0 rgba(255,255,255,0.3),
+                0 2px 4px rgba(0,0,0,0.4);
+            font-weight: bold;
+        }
+
+        .modal-close:hover {
+            background: linear-gradient(180deg, #ffaa44, #ff8811);
+        }
+
+        .modal-close:active {
+            box-shadow: 
+                inset 0 2px 4px rgba(0,0,0,0.3),
+                inset 0 -1px 0 rgba(255,255,255,0.1);
+        }
+
+        .guide-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 12px;
+        }
+
+        .guide-card {
+            background: linear-gradient(180deg, #ffffff 0%, #f5f5f5 100%);
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            padding: 14px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            box-shadow: 
+                inset 0 1px 0 rgba(255,255,255,0.8),
+                0 2px 4px rgba(0,0,0,0.2);
+        }
+
+        .guide-card:hover {
+            background: linear-gradient(180deg, #fffacd 0%, #ffed4e 100%);
+            border-color: #ff8800;
+            transform: translateY(-2px);
+            box-shadow: 
+                inset 0 1px 0 rgba(255,255,255,0.8),
+                0 4px 8px rgba(0,0,0,0.3);
+        }
+
+        .guide-card-number {
+            font-size: 18px;
+            font-weight: bold;
+            color: #4a90e2;
+            margin-bottom: 8px;
+        }
+
+        .guide-card-name {
+            font-size: 12px;
+            color: #333;
+            font-weight: bold;
+        }
+
+        /* Modal scrollbar */
+        .modal-content::-webkit-scrollbar {
+            width: 10px;
+        }
+
+        .modal-content::-webkit-scrollbar-track {
+            background: linear-gradient(90deg, #f5f5f5, #e8e8e8);
+        }
+
+        .modal-content::-webkit-scrollbar-thumb {
+            background: linear-gradient(90deg, #4a90e2, #357abd);
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- SIDEBAR -->
+        <aside class="sidebar">
+            <div class="logo">
+                <h1>APG CABLE</h1>
+                <div class="logo-subtitle">TV Guide 2007</div>
+            </div>
+            <div class="channel-list" id="channel-list"></div>
+        </aside>
+
+        <!-- MAIN -->
+        <div class="main-content">
+            <!-- HEADER -->
+            <header class="header">
+                <div class="now-playing">
+                    <div class="now-playing-label">► Now Showing</div>
+                    <div class="now-playing-title" id="current-channel">Channel 1: APG Television</div>
+                </div>
+                <div class="time-display">
+                    <div class="date" id="current-date"></div>
+                    <div class="time" id="current-time"></div>
+                </div>
+            </header>
+
+            <!-- VIDEO PLAYER -->
+            <div class="video-container">
+                <iframe id="tv-frame" src="apg_television/index.html"></iframe>
+            </div>
+
+            <!-- INFO BAR -->
+            <div class="info-bar">
+                <div class="controls-hint">
+                    <div class="control-item">
+                        <span class="control-key">1-7</span>
+                        <span>Jump to Channel</span>
+                    </div>
+                </div>
+                <div id="channel-status">Channel 1</div>
+            </div>
+
+            <!-- TICKER -->
+            <div class="ticker">
+                <div class="ticker-content">
+                    <div class="ticker-item">BREAKING: US-Iran talks progress in Geneva - Detailed proposals expected within two weeks</div>
+                    <div class="ticker-item">Grammy Awards 2026: Kendrick Lamar wins 5 awards, surpasses Jay-Z as most awarded hip-hop artist</div>
+                    <div class="ticker-item">ALERT: Mass shooting at ice rink in Pawtucket, Rhode Island - 3 killed, 3 injured</div>
+                    <div class="ticker-item">APG MEDIA UPDATE: Nicktoons channel officially closed effective today - Content migrating to sister networks</div>
+                    <div class="ticker-item">Annular solar eclipse visible from Antarctica and Southern Indian Ocean today</div>
+                    <div class="ticker-item">Weather: Portugal under state of calamity - €1 billion loan program for storm recovery launched</div>
+                    <div class="ticker-item">Sudan Airways resumes flights to Khartoum - First since war began in 2023</div>
+                    <div class="ticker-item">BREAKING: US-Iran talks progress in Geneva - Detailed proposals expected within two weeks</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- TV GUIDE MODAL -->
+    <div class="modal" id="guide-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Channel Guide</h2>
+                <button class="modal-close" onclick="toggleGuide()">✕</button>
+            </div>
+            <div class="guide-grid" id="guide-grid"></div>
+        </div>
+    </div>
+
+    <script>
+        const channels = {
+            "1": { src: "apg_television/index.html", name: "APG Television" },
+            "2": { src: "channel8/index.html", name: "Channel 8" },
+            "3": { src: "channel_not_available.mp4", name: "Channel Closed" },
+            "4": { src: "erikinfo/index.html", name: "ErikInfo" },
+            "5": { src: "nickapglandia/index.html", name: "Nickelodeon" },
+            "6": { src: "raretv/index.html", name: "RareTV România" },
+            "7": { src: "channel_not_available.mp4", name: "Nicktoons - CLOSED" }
+        };
+
+        let currentChannel = "1";
+        const iframe = document.getElementById("tv-frame");
+        const channelList = document.getElementById("channel-list");
+        const guideModal = document.getElementById("guide-modal");
+        const guideGrid = document.getElementById("guide-grid");
+        const currentChannelDisplay = document.getElementById("current-channel");
+        const channelStatus = document.getElementById("channel-status");
+
+        // Initialize channel list
+        function initChannelList() {
+            channelList.innerHTML = Object.entries(channels).map(([num, data]) => `
+                <div class="channel-item ${num === currentChannel ? 'active' : ''}" onclick="switchChannel('${num}')">
+                    <div class="channel-item-number">${num}</div>
+                    <div class="channel-item-info">
+                        <div class="channel-item-name">${data.name}</div>
+                        <div class="channel-item-label">Channel</div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Initialize guide
+        function initGuide() {
+            guideGrid.innerHTML = Object.entries(channels).map(([num, data]) => `
+                <div class="guide-card" onclick="switchChannel('${num}'); toggleGuide()">
+                    <div class="guide-card-number">CH ${num}</div>
+                    <div class="guide-card-name">${data.name}</div>
+                </div>
+            `).join('');
+        }
+
+        // Switch channel
+        function switchChannel(num) {
+            currentChannel = num;
+            iframe.src = channels[num].src;
+            currentChannelDisplay.textContent = `Channel ${num}: ${channels[num].name}`;
+            channelStatus.textContent = `Channel ${num}`;
+            
+            document.querySelectorAll('.channel-item').forEach(item => {
+                item.classList.remove('active');
+            });
+            document.querySelector(`.channel-item:nth-child(${parseInt(num) + 1})`).classList.add('active');
+        }
+
+        // Toggle guide
+        function toggleGuide() {
+            // Guide disabled in this simplified version
+        }
+
+        // Update time
+        function updateTime() {
+            const now = new Date();
+            document.getElementById('current-time').textContent = now.toLocaleTimeString('en-US', { 
+                hour: '2-digit', 
+                minute: '2-digit'
+            });
+            document.getElementById('current-date').textContent = now.toLocaleDateString('en-US', {
+                weekday: 'short',
+                month: 'short',
+                day: 'numeric'
+            });
+        }
+
+        // Keyboard shortcuts
+        window.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowRight') {
+                let next = (parseInt(currentChannel) % 7) + 1;
+                switchChannel(next.toString());
+            }
+            if (e.key === 'ArrowLeft') {
+                let prev = parseInt(currentChannel) === 1 ? 7 : parseInt(currentChannel) - 1;
+                switchChannel(prev.toString());
+            }
+            if (!isNaN(e.key) && e.key >= '1' && e.key <= '7') {
+                switchChannel(e.key);
+            }
+        });
+
+        // Close modal on outside click
+        guideModal.addEventListener('click', (e) => {
+            if (e.target === guideModal) toggleGuide();
+        });
+
+        // Initialize
+        initChannelList();
+        initGuide();
+        updateTime();
+        setInterval(updateTime, 1000);
+    </script>
+</body>
+</html>
